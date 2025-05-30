@@ -33,7 +33,7 @@ def download_file(url, filename=None):
 
 if __name__ == "__main__":
     # URL файла для скачивания
-    file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#?date=2025-05-31"  # Замените на нужный URL
+    file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
     
     # Добавляем timestamp к имени файла
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
