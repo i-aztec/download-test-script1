@@ -40,7 +40,7 @@ jobs:
       # Шаг 6: Добавляем и коммитим изменения
       - name: Commit and push changes
         run: |
-          git add downloaded/*
+          git add downloads/*
           git commit -m "Add downloaded file" || echo "No changes to commit"
           git push
         env:
