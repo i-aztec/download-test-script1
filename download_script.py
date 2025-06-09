@@ -34,9 +34,13 @@ def download_file(url, filename=None):
 if __name__ == "__main__":
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
-    
+    file_url2 = "https://api.open-meteo.com/v1/forecast?latitude=51.5053&longitude=0.055&hourly=temperature_2m&models=ukmo_uk_deterministic_2km&current=temperature_2m&temperature_unit=fahrenheit"
+
     # Добавляем timestamp к имени файла
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"file_{timestamp}.tmp"
-    
     download_file(file_url, filename)
+
+    filename2 = f"file2_{timestamp}.tmp"
+    download_file(file_url2, filename2)
+
