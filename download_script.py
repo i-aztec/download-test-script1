@@ -101,10 +101,10 @@ if __name__ == "__main__":
     # Добавляем timestamp к имени файла
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     filename = f"file_{timestamp}.tmp"
-    download_file(file_url, filename)
+    download_file2(file_url, filename)
 
     filename2 = f"file2_{timestamp}.tmp"
-    download_file(file_url2, filename2)
+    download_file2(file_url2, filename2)
 
     filename3 = f"file3_{timestamp}.tmp"
     latest_file = get_latest_file3()
@@ -114,7 +114,7 @@ if __name__ == "__main__":
         
         # Если прошло больше X минут - обновляем
         if time_passed > 25 * 60:
-            download_file(file_url3, filename3)
+            download_file2(file_url3, filename3)
     else:
         # Если файлов вообще нет - скачиваем
-        download_file(file_url3, filename3, api_key)
+        download_file2(file_url3, filename3, api_key)
