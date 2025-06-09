@@ -29,6 +29,8 @@ jobs:
 
       # Шаг 4: Запускаем скрипт для скачивания файла
       - name: Run download script
+        env:
+          API_KEY: ${{ secrets.API_KEY }}
         run: python download_script.py
 
       # Шаг 5: Настраиваем Git
