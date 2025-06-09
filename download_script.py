@@ -1,5 +1,7 @@
 import requests
 import os
+import glob
+import time
 from datetime import datetime
 
 def download_file(url, filename=None):
@@ -31,10 +33,34 @@ def download_file(url, filename=None):
         print(f"Ошибка при скачивании: {e}")
         return None
 
+
+def get_latest_file3():
+    # Ищем все файлы с маской file3_*
+    files = glob.glob("file3_*.tmp")
+    if not files:
+        return None
+    
+    # Получаем словарь {файл: время модификации} для всех файлов
+    files_with_timestamp = {f: os.path.getmtime(f) for f in files}
+    
+    # Находим самый свежий файл
+    latest_file = max(files_with_timestamp, key=files_with_timestamp.get)
+    return latest_file
+
+
+
 if __name__ == "__main__":
+
+    api_key = os.environ['API_KEY']
+
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
     file_url2 = "https://api.open-meteo.com/v1/forecast?latitude=51.5053&longitude=0.055&hourly=temperature_2m&models=ukmo_uk_deterministic_2km&current=temperature_2m&temperature_unit=fahrenheit"
+
+    file_url3 = f"""curl -X GET "https://data.hub.api.metoffice.gov.uk/mo-site-specific-blended-probabilistic-forecast/1.0.0/collections/improver-probabilities-spot-uk/locations/00000005?parameter-name=probability_of_air_temperature_above_threshold%2Cprobability_of_air_temperature_above_threshold_maximum_PT12H%2Cprobability_of_air_temperature_above_threshold_minimum_PT12H" \
+ -H "accept: application/json"\
+ -H "apikey: {api_key}" 
+ """
 
     # Добавляем timestamp к имени файла
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -44,3 +70,15 @@ if __name__ == "__main__":
     filename2 = f"file2_{timestamp}.tmp"
     download_file(file_url2, filename2)
 
+    filename3 = f"file3_{timestamp}.tmp"
+    latest_file = get_latest_file3()
+    if latest_file:
+        last_modified = os.path.getmtime(latest_file)
+        time_passed = time.time() - last_modified
+        
+        # Если прошло больше X минут - обновляем
+        if time_passed > 25 * 60:
+            download_file(file_url3, filename3)
+    else:
+        # Если файлов вообще нет - скачиваем
+        download_file(file_url3, filename3)
