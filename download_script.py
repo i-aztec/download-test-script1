@@ -34,6 +34,46 @@ def download_file(url, filename=None):
         return None
 
 
+def download_file2(url, filename=None, api_key=None):
+    """
+    Скачивает файл по URL с API ключом и сохраняет его
+    """
+    try:
+        # Формируем заголовки
+        if api_key:
+            headers = {
+                'accept': 'application/json',
+                'apikey': api_key
+            }
+        else:
+            headers = None
+        
+        # Делаем запрос с заголовками
+        response = requests.get(url, headers=headers, stream=True)
+        response.raise_for_status()
+        
+        # Если имя файла не указано, извлекаем из URL
+        if not filename:
+            filename = url.split('/')[-1] or 'downloaded_file'
+        
+        # Создаем папку downloads если её нет
+        os.makedirs('downloads', exist_ok=True)
+        
+        filepath = os.path.join('downloads', filename)
+        
+        with open(filepath, 'wb') as file:
+            for chunk in response.iter_content(chunk_size=8192):
+                file.write(chunk)
+        
+        print(f"Файл успешно скачан: {filepath}")
+        print(f"Размер: {os.path.getsize(filepath)} байт")
+        return filepath
+        
+    except requests.exceptions.RequestException as e:
+        print(f"Ошибка при скачивании: {e}")
+        return None
+
+
 def get_latest_file3():
     # Ищем все файлы с маской file3_*
     files = glob.glob("file3_*.tmp")
@@ -56,11 +96,7 @@ if __name__ == "__main__":
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
     file_url2 = "https://api.open-meteo.com/v1/forecast?latitude=51.5053&longitude=0.055&hourly=temperature_2m&models=ukmo_uk_deterministic_2km&current=temperature_2m&temperature_unit=fahrenheit"
-
-    file_url3 = f"""curl -X GET "https://data.hub.api.metoffice.gov.uk/mo-site-specific-blended-probabilistic-forecast/1.0.0/collections/improver-probabilities-spot-uk/locations/00000005?parameter-name=probability_of_air_temperature_above_threshold%2Cprobability_of_air_temperature_above_threshold_maximum_PT12H%2Cprobability_of_air_temperature_above_threshold_minimum_PT12H" \
- -H "accept: application/json"\
- -H "apikey: {api_key}" 
- """
+    file_url3 = "https://data.hub.api.metoffice.gov.uk/mo-site-specific-blended-probabilistic-forecast/1.0.0/collections/improver-probabilities-spot-uk/locations/00000005?parameter-name=probability_of_air_temperature_above_threshold%2Cprobability_of_air_temperature_above_threshold_maximum_PT12H%2Cprobability_of_air_temperature_above_threshold_minimum_PT12H" 
 
     # Добавляем timestamp к имени файла
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -81,4 +117,4 @@ if __name__ == "__main__":
             download_file(file_url3, filename3)
     else:
         # Если файлов вообще нет - скачиваем
-        download_file(file_url3, filename3)
+        download_file(file_url3, filename3, api_key)
