@@ -76,8 +76,9 @@ def download_file2(url, filename=None, api_key=None):
 
 def get_latest_file3():
     # Ищем все файлы с маской file3_*
-    files = glob.glob("file3_*.tmp")
+    files = glob.glob("./downloads/file3_*.tmp")
     if not files:
+        print("Файлов с маской file3_ не наёдено")
         return None
     
     # Получаем словарь {файл: время модификации} для всех файлов
@@ -85,13 +86,16 @@ def get_latest_file3():
     
     # Находим самый свежий файл
     latest_file = max(files_with_timestamp, key=files_with_timestamp.get)
+
+    print(f"Найден самый свежий файл {latest_file}")
     return latest_file
 
 
 
 if __name__ == "__main__":
 
-    api_key = os.environ['API_KEY']
+    #api_key = os.environ['API_KEY']
+    api_key = None
 
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
@@ -114,7 +118,11 @@ if __name__ == "__main__":
         
         # Если прошло больше X минут - обновляем
         if time_passed > 25 * 60:
-            download_file2(file_url3, filename3)
+            print("Существует недавний file3_")
+            download_file2(file_url3, filename3, api_key)
+        else:
+            print("Прошло меньше X минут после обновления файла")
     else:
         # Если файлов вообще нет - скачиваем
+        print("Файла file3_ вообще нет - скачиваем")
         download_file2(file_url3, filename3, api_key)
