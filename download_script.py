@@ -94,8 +94,8 @@ def get_latest_file3():
 
 if __name__ == "__main__":
 
-    #api_key = os.environ['API_KEY']
-    api_key = None
+    api_key = os.environ['API_KEY']
+    #api_key = None
 
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
