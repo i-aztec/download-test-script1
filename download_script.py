@@ -2,7 +2,7 @@ import requests
 import os
 import glob
 import time
-from datetime import datetime
+from datetime import datetime, timedelta
 
 def download_file(url, filename=None):
     """
@@ -74,20 +74,35 @@ def download_file2(url, filename=None, api_key=None):
         return None
 
 
+# def get_latest_file3():
+#     # Ищем все файлы с маской file3_*
+#     files = glob.glob("./downloads/file3_*.tmp")
+#     if not files:
+#         print("Файлов с маской file3_ не наёдено")
+#         return None
+    
+#     # Получаем словарь {файл: время модификации} для всех файлов
+#     files_with_timestamp = {f: os.path.getmtime(f) for f in files}
+    
+#     # Находим самый свежий файл
+#     latest_file = max(files_with_timestamp, key=files_with_timestamp.get)
+
+#     print(f"Найден самый свежий файл {latest_file}")
+#     return latest_file
+
+
 def get_latest_file3():
     # Ищем все файлы с маской file3_*
     files = glob.glob("./downloads/file3_*.tmp")
     if not files:
-        print("Файлов с маской file3_ не наёдено")
+        print("Файлов с маской file3_ не найдено")
         return None
     
-    # Получаем словарь {файл: время модификации} для всех файлов
-    files_with_timestamp = {f: os.path.getmtime(f) for f in files}
-    
-    # Находим самый свежий файл
-    latest_file = max(files_with_timestamp, key=files_with_timestamp.get)
+    # Просто находим максимальное имя файла. 
+    # Так как формат даты YYYYMMDD_HHMMSS, сортировка строк сработает правильно.
+    latest_file = max(files)
 
-    print(f"Найден самый свежий файл {latest_file}")
+    print(f"Найден самый свежий файл (по имени): {latest_file}")
     return latest_file
 
 
@@ -115,14 +130,22 @@ if __name__ == "__main__":
     filename3 = f"file3_{timestamp}.tmp"
     latest_file = get_latest_file3()
     if latest_file:
-        last_modified = os.path.getmtime(latest_file)
-        time_passed = time.time() - last_modified
+        #last_modified = os.path.getmtime(latest_file)
+        #time_passed = time.time() - last_modified
 
-        minutes_passed = time_passed / 60
+        timestamp_str = os.path.basename(latest_file)[6:-4] # Убираем 'file3_' и '.tmp'
+        # Превращаем строку в объект datetime
+        file_datetime = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
+
+        time_passed_delta = datetime.now() - file_datetime
+        minutes_passed = time_passed_delta.total_seconds() / 60
+
+        print(f"Время файла по его имени: {file_datetime}")
         print(f"Прошло {minutes_passed:.1f} минут с последнего обновления")
         
         # Если прошло больше X минут - обновляем
-        if time_passed > 25 * 60:
+        #if time_passed > 25 * 60:
+        if time_passed_delta > timedelta(minutes=25):
             #print("Существует недавний file3_")
             download_file2(file_url3, filename3, api_key)
         else:
