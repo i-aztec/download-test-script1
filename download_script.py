@@ -94,8 +94,10 @@ def get_latest_file3():
 
 if __name__ == "__main__":
 
-    api_key = os.environ['API_KEY']
-    #api_key = None
+    try:
+        api_key = os.environ['API_KEY']
+    except:
+        api_key = None
 
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
@@ -115,10 +117,13 @@ if __name__ == "__main__":
     if latest_file:
         last_modified = os.path.getmtime(latest_file)
         time_passed = time.time() - last_modified
+
+        minutes_passed = time_passed / 60
+        print(f"Прошло {minutes_passed:.1f} минут с последнего обновления")
         
         # Если прошло больше X минут - обновляем
         if time_passed > 25 * 60:
-            print("Существует недавний file3_")
+            #print("Существует недавний file3_")
             download_file2(file_url3, filename3, api_key)
         else:
             print("Прошло меньше X минут после обновления файла")
