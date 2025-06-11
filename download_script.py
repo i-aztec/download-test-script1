@@ -110,14 +110,24 @@ def get_latest_file3():
 if __name__ == "__main__":
 
     try:
-        api_key = os.environ['API_KEY']
+        api_key3 = os.environ['API_KEY_MET_UK']
     except:
-        api_key = None
+        api_key3 = None
+
+    try:
+        api_key4 = os.environ['API_KEY_MET_GLOB']
+    except:
+        api_key4 = None
 
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
+
     file_url2 = "https://api.open-meteo.com/v1/forecast?latitude=51.5053&longitude=0.055&hourly=temperature_2m&models=ukmo_uk_deterministic_2km&current=temperature_2m&temperature_unit=fahrenheit"
+
     file_url3 = "https://data.hub.api.metoffice.gov.uk/mo-site-specific-blended-probabilistic-forecast/1.0.0/collections/improver-probabilities-spot-uk/locations/00000005?parameter-name=probability_of_air_temperature_above_threshold%2Cprobability_of_air_temperature_above_threshold_maximum_PT12H%2Cprobability_of_air_temperature_above_threshold_minimum_PT12H" 
+
+    file_url4 = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly?latitude=51.5053&longitude=0.0553"
+
 
     # Добавляем timestamp к имени файла
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -128,6 +138,8 @@ if __name__ == "__main__":
     download_file2(file_url2, filename2)
 
     filename3 = f"file3_{timestamp}.tmp"
+    filename4 = f"file4_{timestamp}.tmp"
+
     latest_file = get_latest_file3()
     if latest_file:
         #last_modified = os.path.getmtime(latest_file)
@@ -147,10 +159,12 @@ if __name__ == "__main__":
         #if time_passed > 25 * 60:
         if time_passed_delta > timedelta(minutes=25):
             #print("Существует недавний file3_")
-            download_file2(file_url3, filename3, api_key)
+            download_file2(file_url3, filename3, api_key3)
+            download_file2(file_url4, filename4, api_key4)
         else:
             print("Прошло меньше X минут после обновления файла")
     else:
         # Если файлов вообще нет - скачиваем
         print("Файла file3_ вообще нет - скачиваем")
-        download_file2(file_url3, filename3, api_key)
+        download_file2(file_url3, filename3, api_key3)
+        download_file2(file_url4, filename4, api_key4)
