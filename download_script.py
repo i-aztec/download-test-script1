@@ -1,6 +1,7 @@
 import os
 import requests
 import glob
+import json
 import time
 from datetime import datetime, timedelta
 
@@ -80,6 +81,7 @@ if __name__ == "__main__":
     except:
         api_key_atmo = None
 
+
     # URL файла для скачивания
     file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  
 
@@ -137,7 +139,7 @@ if __name__ == "__main__":
 
     download_file2(file_url_atmolatest, filename_atmolatest, api_key_atmo)
 
-    with open('atmosph/file_atmo_latest.json') as f:
+    with open('./downloads/atmosph/file_atmo_latest.json') as f:
         dict_ = json.load(f)
 
     available_fileid = list()
