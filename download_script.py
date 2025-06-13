@@ -1,40 +1,12 @@
-import requests
 import os
+import requests
 import glob
 import time
 from datetime import datetime, timedelta
 
-def download_file(url, filename=None):
-    """
-    Скачивает файл по URL и сохраняет его
-    """
-    try:
-        response = requests.get(url, stream=True)
-        response.raise_for_status()
-        
-        # Если имя файла не указано, извлекаем из URL
-        if not filename:
-            filename = url.split('/')[-1] or 'downloaded_file'
-        
-        # Создаем папку downloads если её нет
-        os.makedirs('downloads', exist_ok=True)
-        
-        filepath = os.path.join('downloads', filename)
-        
-        with open(filepath, 'wb') as file:
-            for chunk in response.iter_content(chunk_size=8192):
-                file.write(chunk)
-        
-        print(f"Файл успешно скачан: {filepath}")
-        print(f"Размер: {os.path.getsize(filepath)} байт")
-        return filepath
-        
-    except requests.exceptions.RequestException as e:
-        print(f"Ошибка при скачивании: {e}")
-        return None
 
 
-def download_file2(url, filename=None, api_key=None):
+def download_file2(url, filename=None, api_key=None, headers_accept='application/json'):
     """
     Скачивает файл по URL с API ключом и сохраняет его
     """
@@ -42,14 +14,14 @@ def download_file2(url, filename=None, api_key=None):
         # Формируем заголовки
         if api_key:
             headers = {
-                'accept': 'application/json',
+                'accept': headers_accept,
                 'apikey': api_key
             }
         else:
             headers = None
         
         # Делаем запрос с заголовками
-        response = requests.get(url, headers=headers, stream=True)
+        response = requests.get(url, headers=headers, stream=True, allow_redirects=True)
         response.raise_for_status()
         
         # Если имя файла не указано, извлекаем из URL
@@ -73,22 +45,6 @@ def download_file2(url, filename=None, api_key=None):
         print(f"Ошибка при скачивании: {e}")
         return None
 
-
-# def get_latest_file3():
-#     # Ищем все файлы с маской file3_*
-#     files = glob.glob("./downloads/file3_*.tmp")
-#     if not files:
-#         print("Файлов с маской file3_ не наёдено")
-#         return None
-    
-#     # Получаем словарь {файл: время модификации} для всех файлов
-#     files_with_timestamp = {f: os.path.getmtime(f) for f in files}
-    
-#     # Находим самый свежий файл
-#     latest_file = max(files_with_timestamp, key=files_with_timestamp.get)
-
-#     print(f"Найден самый свежий файл {latest_file}")
-#     return latest_file
 
 
 def get_latest_file3():
@@ -119,8 +75,13 @@ if __name__ == "__main__":
     except:
         api_key4 = None
 
+    try:
+        api_key_atmo = os.environ['API_KEY_MET_ATMO']
+    except:
+        api_key_atmo = None
+
     # URL файла для скачивания
-    file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  # Замените на нужный URL
+    file_url = "https://weather.metoffice.gov.uk/forecast/u10j124jp#"  
 
     file_url2 = "https://api.open-meteo.com/v1/forecast?latitude=51.5053&longitude=0.055&hourly=temperature_2m&models=ukmo_uk_deterministic_2km&current=temperature_2m&temperature_unit=fahrenheit"
 
@@ -168,3 +129,34 @@ if __name__ == "__main__":
         print("Файла file3_ вообще нет - скачиваем")
         download_file2(file_url3, filename3, api_key3)
         download_file2(file_url4, filename4, api_key4)
+
+
+
+    file_url_atmolatest = "https://data.hub.api.metoffice.gov.uk/atmospheric-models/1.0.0/orders/o220948200789/latest?detail=MINIMAL&dataSpec=1.0.0"
+    filename_atmolatest = 'atmosph/file_atmo_latest.json'
+
+    download_file2(file_url_atmolatest, filename_atmolatest, api_key_atmo)
+
+    with open('atmosph/file_atmo_latest.json') as f:
+        dict_ = json.load(f)
+
+    available_fileid = list()
+    for i in range(len(dict_['orderDetails']['files'])):
+        fileid = dict_['orderDetails']['files'][i]['fileId']
+        if len(fileid.split('_')[-1])>4:
+            available_fileid.append(fileid)
+
+
+    files = os.listdir("./downloads/atmosph/")
+    for fileid in sorted(available_fileid)[-3:]:
+        fname = fileid + '.dat'
+        if fname not in files:
+            print(f"{fname} downloading")
+            filename_atmodata = f"atmosph/{fileid}.dat"
+            file_url_atmodata = f"https://data.hub.api.metoffice.gov.uk/atmospheric-models/1.0.0/orders/o220948200789/latest/{fileid}/data"
+            file_url_atmodata = file_url_atmodata.replace('+','%2B')
+            headers_accept = 'application/x-grib'
+
+            download_file2(file_url_atmodata, filename_atmodata, api_key_atmo, headers_accept)
+        else:
+            print(f"{fname} already downloaded")
