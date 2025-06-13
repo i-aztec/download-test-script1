@@ -32,6 +32,7 @@ jobs:
         env:
           API_KEY_MET_UK: ${{ secrets.API_KEY_MET_UK }}
           API_KEY_MET_GLOB: ${{ secrets.API_KEY_MET_GLOB }}
+          API_KEY_MET_ATMO: ${{ secrets.API_KEY_MET_ATMO }}
         run: python download_script.py
 
       # Шаг 5: Настраиваем Git
