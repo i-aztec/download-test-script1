@@ -102,7 +102,7 @@ if __name__ == "__main__":
     filename2 = f"open-deterministic/file2_{timestamp}.tmp"
     download_file2(file_url2, filename2)
 
-    filename21 = f"open-ensamble/file21_{timestamp}.tmp"
+    filename21 = f"open-ensemble/file21_{timestamp}.tmp"
     download_file2(file_url21, filename21)
 
     filename3 = f"met-proba/file3_{timestamp}.tmp"
