@@ -115,7 +115,7 @@ if __name__ == "__main__":
 
         timestamp_str = os.path.basename(latest_file)[6:-4] # Убираем 'file3_' и '.tmp'
         # Превращаем строку в объект datetime
-        file_datetime = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
+        file_datetime = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S").replace(tzinfo=timezone.utc)
 
         time_passed_delta = datetime.now(timezone.utc) - file_datetime
         minutes_passed = time_passed_delta.total_seconds() / 60
