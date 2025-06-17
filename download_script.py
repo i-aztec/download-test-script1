@@ -3,7 +3,7 @@ import requests
 import glob
 import json
 import time
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 
@@ -50,7 +50,7 @@ def download_file2(url, filename=None, api_key=None, headers_accept='application
 
 def get_latest_file3():
     # Ищем все файлы с маской file3_*
-    files = glob.glob("./downloads/file3_*.tmp")
+    files = glob.glob("./downloads/met-proba/file3_*.tmp")
     if not files:
         print("Файлов с маской file3_ не найдено")
         return None
@@ -87,21 +87,26 @@ if __name__ == "__main__":
 
     file_url2 = "https://api.open-meteo.com/v1/forecast?latitude=51.5053&longitude=0.055&hourly=temperature_2m&models=ukmo_uk_deterministic_2km&current=temperature_2m&temperature_unit=fahrenheit"
 
+    file_url21 = "https://ensemble-api.open-meteo.com/v1/ensemble?latitude=51.5053&longitude=0.0553&hourly=temperature_2m&models=ukmo_uk_ensemble_2km&temperature_unit=fahrenheit"
+
     file_url3 = "https://data.hub.api.metoffice.gov.uk/mo-site-specific-blended-probabilistic-forecast/1.0.0/collections/improver-probabilities-spot-uk/locations/00000005?parameter-name=probability_of_air_temperature_above_threshold%2Cprobability_of_air_temperature_above_threshold_maximum_PT12H%2Cprobability_of_air_temperature_above_threshold_minimum_PT12H" 
 
     file_url4 = "https://data.hub.api.metoffice.gov.uk/sitespecific/v0/point/hourly?latitude=51.5053&longitude=0.0553"
 
 
     # Добавляем timestamp к имени файла
-    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-    filename = f"file_{timestamp}.tmp"
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    filename = f"site/file_{timestamp}.tmp"
     download_file2(file_url, filename)
 
-    filename2 = f"file2_{timestamp}.tmp"
+    filename2 = f"open-deterministic/file2_{timestamp}.tmp"
     download_file2(file_url2, filename2)
 
-    filename3 = f"file3_{timestamp}.tmp"
-    filename4 = f"file4_{timestamp}.tmp"
+    filename21 = f"open-ensamble/file21_{timestamp}.tmp"
+    download_file2(file_url21, filename21)
+
+    filename3 = f"met-proba/file3_{timestamp}.tmp"
+    filename4 = f"met-site-specific/file4_{timestamp}.tmp"
 
     latest_file = get_latest_file3()
     if latest_file:
@@ -112,7 +117,7 @@ if __name__ == "__main__":
         # Превращаем строку в объект datetime
         file_datetime = datetime.strptime(timestamp_str, "%Y%m%d_%H%M%S")
 
-        time_passed_delta = datetime.now() - file_datetime
+        time_passed_delta = datetime.now(timezone.utc) - file_datetime
         minutes_passed = time_passed_delta.total_seconds() / 60
 
         print(f"Время файла по его имени: {file_datetime}")
