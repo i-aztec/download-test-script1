@@ -127,14 +127,14 @@ if __name__ == "__main__":
         #if time_passed > 25 * 60:
         if time_passed_delta > timedelta(minutes=25):
             #print("Существует недавний file3_")
-            download_file2(file_url3, filename3, api_key3)
+            #download_file2(file_url3, filename3, api_key3)
             download_file2(file_url4, filename4, api_key4)
         else:
             print("Прошло меньше X минут после обновления файла")
     else:
         # Если файлов вообще нет - скачиваем
         print("Файла file3_ вообще нет - скачиваем")
-        download_file2(file_url3, filename3, api_key3)
+        #download_file2(file_url3, filename3, api_key3)
         download_file2(file_url4, filename4, api_key4)
 
 
